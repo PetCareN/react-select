@@ -38,6 +38,7 @@ export type CreatableProps = {|
   isLoading?: boolean,
   isMulti?: boolean,
   onChange: (ValueType, ActionMeta) => void,
+  name?: string
 |};
 
 export type Props = SelectProps & CreatableProps;
@@ -93,7 +94,7 @@ export const makeCreatableSelect = <C: {}>(
         options: options,
       };
     }
-    componentWillReceiveProps(nextProps: CreatableProps & C) {
+    UNSAFE_componentWillReceiveProps(nextProps: CreatableProps & C) {
       const {
         allowCreateWhileLoading,
         createOptionPosition,
@@ -129,9 +130,10 @@ export const makeCreatableSelect = <C: {}>(
         onChange,
         onCreateOption,
         value,
+        name
       } = this.props;
       if (actionMeta.action !== 'select-option') {
-        return onChange(newValue, actionMeta);
+        return onChange(newValue, {...actionMeta, name});
       }
       const { newOption } = this.state;
       const valueArray = Array.isArray(newValue) ? newValue : [newValue];
@@ -142,14 +144,14 @@ export const makeCreatableSelect = <C: {}>(
           const newOptionData = getNewOptionData(inputValue, inputValue);
           const newActionMeta = { action: 'create-option' };
           if (isMulti) {
-            onChange([...cleanValue(value), newOptionData], newActionMeta);
+            onChange([...cleanValue(value), newOptionData], {...newActionMeta, name});
           } else {
-            onChange(newOptionData, newActionMeta);
+            onChange(newOptionData, {...newActionMeta, name});
           }
         }
         return;
       }
-      onChange(newValue, actionMeta);
+      onChange(newValue, {...actionMeta, name});
     };
     focus() {
       this.select.focus();
